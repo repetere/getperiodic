@@ -11,7 +11,7 @@ var exec = require('child_process').exec;
 module.exports = function(grunt) {
   grunt.initConfig({
     jsbeautifier: {
-      files: ["src/**/*.js"],
+      files: ["src/**/*.js","src/**/*.css"],
       options: {
         jshintrc: '.jsbeautify'
       },
@@ -36,24 +36,41 @@ module.exports = function(grunt) {
         'Gruntfile.js',
         'index.js',
         'src/**/*.js',
+        '!src/assets/js/main.js',
         'test/**/*.js'
       ]
     },
     browserify: {
       dist: {
         files: {
-          'dist/assets/js/main.js': ['src/assets/js/main.js'],
+          'src/assets/js/main.js': ['src/assets/js/main_src.js'],
+          'dist/assets/js/main.js': ['src/assets/js/main_src.js'],
+        }
+      }
+    },
+    uglify: {
+      options: {
+        sourceMap: true,
+        compress: {
+          drop_console: false,
+        }
+      },
+      all: {
+        files: {
+          'dist/assets/js/main.min.js': ['dist/assets/js/main.js']
         }
       }
     },
     less: {
       development: {
         options: {
-          paths: ["src/assets/css"],
-          yuicompress: true
+          // paths: ["src/assets/css"],
+          sourceMap: true,
+          yuicompress: true,
+          compress: true
         },
         files: {
-          "dist/assets/css/main.css": "src/assets/less/main.less"
+          "dist/assets/css/main.min.css": "src/assets/less/main.less"
         }
       }
     },
@@ -62,7 +79,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd:'src/views',
-          src: [ '**/*.ejs','!shared/**/*.ejs' ],
+          src: [ 'pages/*.ejs','index.ejs','!shared/**/*.ejs' ],
           dest: 'dist',
           ext: '.html'
         }],
@@ -98,7 +115,7 @@ module.exports = function(grunt) {
           'src/**/*.ejs',
           'src/**/*.less'
         ],
-        tasks: ['lint', 'less', 'template', 'browserify','minimg'],
+        tasks: ['lint', 'css', 'html', 'packagejs','minimg','minjs'],
         options: {
           interrupt: true
         }
@@ -143,13 +160,18 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-newer');
   grunt.loadNpmTasks('grunt-contrib-imagemin');
   grunt.loadNpmTasks('grunt-build-control');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
 
   // grunt.registerTask('default', ['imagemin']);
   grunt.registerTask('default', ['jshint', 'simplemocha', 'template', 'less']);
-  grunt.registerTask('lint', ['jshint', 'jsbeautifier']);
-  grunt.registerTask('test', 'simplemocha');
+  grunt.registerTask('lint', ['newer:jshint', 'newer:jsbeautifier']);
+  grunt.registerTask('test', 'newer:simplemocha');
   grunt.registerTask('build', ['buildcontrol:pages']);
+  grunt.registerTask('packagejs','newer:browserify');
+  grunt.registerTask('minjs','newer:uglify');
+  grunt.registerTask('html','newer:template');
+  grunt.registerTask('css','newer:less');
   // grunt.registerTask('minimg', ['imagemin:dynamic']);
   grunt.registerTask('minimg', ['newer:imagemin:dynamic']);
 };
