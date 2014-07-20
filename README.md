@@ -1,4 +1,0 @@
-getperiodic
-===========
-
-periodic project page
