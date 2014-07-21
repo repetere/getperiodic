@@ -6,7 +6,7 @@
  */
 
 'use strict';
-var exec = require('child_process').exec;
+var path = require('path');
 
 module.exports = function(grunt) {
   grunt.initConfig({
@@ -83,9 +83,31 @@ module.exports = function(grunt) {
           dest: 'dist',
           ext: '.html'
         }],
-        variables: {
-          env: "environment"
-        }
+        variables: function () {
+            // console.log(grunt.task.current.data);
+            // console.log(grunt.task.current.files);
+            // console.log('grunt.task.current.filesSrc',grunt.task.current.filesSrc);
+            var dataobj, jsonfilepath, filesource;            
+            for(var x in grunt.task.current.filesSrc){
+              filesource = grunt.task.current.filesSrc[x];
+              jsonfilepath = path.resolve(path.dirname(filesource),path.basename(filesource, path.extname(filesource))+'.json');
+              dataobj = grunt.file.readJSON(jsonfilepath);
+              // console.log("jsonfilepath",jsonfilepath);
+              return{
+                data: dataobj
+              };
+            }
+          }
+        // variables: {
+        //   data: function (dest, src) {
+        //     console.log('arguments.length',arguments.length);
+        //     console.log("dest",dest, "src", src);
+        //     var data = src;
+        //     data = src[0].split('.')[0] + '.json';
+        //       // Resolve file.json in the views/view folder
+        //     return {"rand":"cool"};//grunt.file.readJSON(data);
+        //   }
+        // }
       }
     },
     imagemin: {                          // Task
@@ -171,6 +193,14 @@ module.exports = function(grunt) {
   grunt.registerTask('packagejs','newer:browserify');
   grunt.registerTask('minjs','newer:uglify');
   grunt.registerTask('html','newer:template');
+  grunt.registerTask('htmljson',function(){
+    console.log("this",this);
+    // console.log("file",file);
+    // if (file) {
+    //   grunt.config('newer:template', 'src/views/' + file + '_test.js');
+    // }
+    grunt.task.run('newer:template');
+  });
   grunt.registerTask('css','newer:less');
   // grunt.registerTask('minimg', ['imagemin:dynamic']);
   grunt.registerTask('minimg', ['newer:imagemin:dynamic']);
