@@ -6,11 +6,11 @@
 
 @font-face {
 	font-family: 'Open Sans';
-	src: url('/assets/font/opensans/opensans-regular-webfont.eot');
-	src: url('/assets/font/opensans/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'),
-	     url('/assets/font/opensans/opensans-regular-webfont.woff') format('woff'),
-	     url('/assets/font/opensans/opensans-regular-webfont.ttf') format('truetype'),
-	     url('/assets/font/opensans/opensans-regular-webfont.svg#open_sansregular') format('svg');
+	src: url('../font/opensans/opensans-regular-webfont.eot');
+	src: url('../font/opensans/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+	     url('../font/opensans/opensans-regular-webfont.woff') format('woff'),
+	     url('../font/opensans/opensans-regular-webfont.ttf') format('truetype'),
+	     url('../font/opensans/opensans-regular-webfont.svg#open_sansregular') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -119,6 +119,14 @@ body{
 		}
 		.page-inner{
 			padding:1em;
+			line-height:1.75em;
+			a{
+				text-decoration: none;
+				color: #3966A2;
+				font-weight: bold;
+				/* border-bottom: 1px solid black; */
+				font-size: 121%;
+			}
 		}
 	}
 	&.show-left-page,
