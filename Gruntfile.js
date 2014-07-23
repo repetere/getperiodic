@@ -8,200 +8,170 @@
 'use strict';
 var path = require('path');
 
-module.exports = function(grunt) {
-  grunt.initConfig({
-    jsbeautifier: {
-      files: ["src/**/*.js","src/**/*.css"],
-      options: {
-        jshintrc: '.jsbeautify'
-      },
-    },
-    simplemocha: {
-      options: {
-        globals: ['should'],
-        timeout: 3000,
-        ignoreLeaks: false,
-        ui: 'bdd',
-        reporter: 'tap'
-      },
-      all: {
-        src: 'test/**/*.js'
-      }
-    },
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc'
-      },
-      all: [
-        'Gruntfile.js',
-        'index.js',
-        'src/**/*.js',
-        '!src/assets/js/main.js',
-        'test/**/*.js'
-      ]
-    },
-    browserify: {
-      dist: {
-        files: {
-          'src/assets/js/main.js': ['src/assets/js/main_src.js'],
-          'dist/assets/js/main.js': ['src/assets/js/main_src.js'],
-        }
-      }
-    },
-    uglify: {
-      options: {
-        sourceMap: true,
-        compress: {
-          drop_console: false,
-        }
-      },
-      all: {
-        files: {
-          'dist/assets/js/main.min.js': ['dist/assets/js/main.js']
-        }
-      }
-    },
-    less: {
-      development: {
-        options: {
-          // paths: ["src/assets/css"],
-          sourceMap: true,
-          yuicompress: true,
-          compress: true
-        },
-        files: {
-          "dist/assets/css/main.min.css": "src/assets/less/main.less"
-        }
-      }
-    },
-    template: {
-      all: {
-        files: [{
-          expand: true,
-          cwd:'src/views',
-          src: [ 'pages/*.ejs','index.ejs','!shared/**/*.ejs' ],
-          dest: 'dist',
-          ext: '.html'
-        }],
-        variables: function () {
-            // console.log(grunt.task.current.data);
-            // console.log(grunt.task.current.files);
-            // console.log('grunt.task.current.filesSrc',grunt.task.current.filesSrc);
-            var dataobj, jsonfilepath, filesource;            
-            for(var x in grunt.task.current.filesSrc){
-              filesource = grunt.task.current.filesSrc[x];
-              jsonfilepath = path.resolve(path.dirname(filesource),path.basename(filesource, path.extname(filesource))+'.json');
-              dataobj = grunt.file.readJSON(jsonfilepath);
-              // console.log("jsonfilepath",jsonfilepath);
-              return{
-                data: dataobj
-              };
-            }
-          }
-        // variables: {
-        //   data: function (dest, src) {
-        //     console.log('arguments.length',arguments.length);
-        //     console.log("dest",dest, "src", src);
-        //     var data = src;
-        //     data = src[0].split('.')[0] + '.json';
-        //       // Resolve file.json in the views/view folder
-        //     return {"rand":"cool"};//grunt.file.readJSON(data);
-        //   }
-        // }
-      }
-    },
-    imagemin: {                          // Task
-      dynamic: {                         // Another target
-        options: {                       // Target options
-          optimizationLevel: 7
-        },
-        files: [{
-          expand: true,                  // Enable dynamic expansion
-          cwd: 'src/',                   // Src matches are relative to this path
-          src: ['**/*.{png,jpg,gif}'],   // Actual patterns to match
-          dest: 'dist/'                  // Destination path prefix
-        }]
-      }
-    },
-    watch: {
-      scripts: {
-        // files: '**/*.js',
-        files: [
-          'Gruntfile.js',
-          'src/**/*.js',
-          'src/**/*.png',
-          'src/**/*.svg',
-          'src/**/*.gif',
-          'src/**/*.jpg',
-          'test/**/*.js',
-          'src/**/*.ejs',
-          'src/**/*.less'
-        ],
-        tasks: ['lint', 'css', 'html', 'packagejs','minimg','minjs'],
-        options: {
-          interrupt: true
-        }
-      }
-    },
-    buildcontrol: {
-      options: {
-        dir: 'dist',
-        commit: true,
-        push: true,
-        message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%'
-      },
-      pages: {
-        options: {
-          remote: 'git@github.com:typesettin/getperiodic.git',
-          branch: 'gh-pages'
-        }
-      },
-      // heroku: {
-      //   options: {
-      //     remote: 'git@heroku.com:example-heroku-webapp-1988.git',
-      //     branch: 'master',
-      //     tag: pkg.version
-      //   }
-      // },
-      // local: {
-      //   options: {
-      //     remote: '../',
-      //     branch: 'build'
-      //   }
-      // }
-    }
-  });
+module.exports = function (grunt) {
+	grunt.initConfig({
+		jsbeautifier: {
+			files: ["<%= jshint.all %>", "src/**/*.css", "src/**/*.ejs"],
+			options: {
+				config: '.jsbeautify'
+			},
+		},
+		simplemocha: {
+			options: {
+				globals: ['should'],
+				timeout: 3000,
+				ignoreLeaks: false,
+				ui: 'bdd',
+				reporter: 'tap'
+			},
+			all: {
+				src: 'test/**/*.js'
+			}
+		},
+		jshint: {
+			options: {
+				jshintrc: '.jshintrc'
+			},
+			all: [
+				'Gruntfile.js',
+				'index.js',
+				'src/**/*.js',
+				'!src/assets/js/main.js',
+				'test/**/*.js'
+			]
+		},
+		browserify: {
+			dist: {
+				files: {
+					'src/assets/js/main.js': ['src/assets/js/main_src.js'],
+					'dist/assets/js/main.js': ['src/assets/js/main_src.js'],
+				}
+			}
+		},
+		uglify: {
+			options: {
+				sourceMap: true,
+				compress: {
+					drop_console: false,
+				}
+			},
+			all: {
+				files: {
+					'dist/assets/js/main.min.js': ['dist/assets/js/main.js']
+				}
+			}
+		},
+		less: {
+			development: {
+				options: {
+					// paths: ["src/assets/css"],
+					sourceMap: true,
+					yuicompress: true,
+					compress: true
+				},
+				files: {
+					"dist/assets/css/main.min.css": "src/assets/less/main.less"
+				}
+			}
+		},
+		template: {
+			all: {
+				files: [{
+					expand: true,
+					cwd: 'src/views',
+					src: ['pages/*.ejs', 'index.ejs', '!shared/**/*.ejs'],
+					dest: 'dist',
+					ext: '.html'
+				}],
+				variables: {
+					env: true
+				}
+			}
+		},
+		imagemin: { // Task
+			dynamic: { // Another target
+				options: { // Target options
+					optimizationLevel: 7
+				},
+				files: [{
+					expand: true, // Enable dynamic expansion
+					cwd: 'src/', // Src matches are relative to this path
+					src: ['**/*.{png,jpg,gif}'], // Actual patterns to match
+					dest: 'dist/' // Destination path prefix
+				}]
+			}
+		},
+		watch: {
+			scripts: {
+				// files: '**/*.js',
+				files: [
+					'Gruntfile.js',
+					'src/**/*.js',
+					'src/**/*.png',
+					'src/**/*.svg',
+					'src/**/*.gif',
+					'src/**/*.jpg',
+					'test/**/*.js',
+					'src/**/*.ejs',
+					'src/**/*.less'
+				],
+				tasks: ['lint', 'css', 'html', 'packagejs', 'minimg', 'minjs'],
+				options: {
+					interrupt: true
+				}
+			}
+		},
+		buildcontrol: {
+			options: {
+				dir: 'dist',
+				commit: true,
+				push: true,
+				message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%'
+			},
+			pages: {
+				options: {
+					remote: 'git@github.com:typesettin/getperiodic.git',
+					branch: 'gh-pages'
+				}
+			},
+			// heroku: {
+			//   options: {
+			//     remote: 'git@heroku.com:example-heroku-webapp-1988.git',
+			//     branch: 'master',
+			//     tag: pkg.version
+			//   }
+			// },
+			// local: {
+			//   options: {
+			//     remote: '../',
+			//     branch: 'build'
+			//   }
+			// }
+		}
+	});
 
-  grunt.loadNpmTasks('grunt-simple-mocha');
-  grunt.loadNpmTasks('grunt-jsbeautifier');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-templater');
-  grunt.loadNpmTasks('grunt-newer');
-  grunt.loadNpmTasks('grunt-contrib-imagemin');
-  grunt.loadNpmTasks('grunt-build-control');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-simple-mocha');
+	grunt.loadNpmTasks('grunt-jsbeautifier');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-browserify');
+	grunt.loadNpmTasks('grunt-templater');
+	grunt.loadNpmTasks('grunt-newer');
+	grunt.loadNpmTasks('grunt-contrib-imagemin');
+	grunt.loadNpmTasks('grunt-build-control');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 
-  // grunt.registerTask('default', ['imagemin']);
-  grunt.registerTask('default', ['jshint', 'simplemocha', 'template', 'less']);
-  grunt.registerTask('lint', ['newer:jshint', 'newer:jsbeautifier']);
-  grunt.registerTask('test', 'newer:simplemocha');
-  grunt.registerTask('build', ['buildcontrol:pages']);
-  grunt.registerTask('packagejs','newer:browserify');
-  grunt.registerTask('minjs','newer:uglify');
-  grunt.registerTask('html','newer:template');
-  grunt.registerTask('htmljson',function(){
-    console.log("this",this);
-    // console.log("file",file);
-    // if (file) {
-    //   grunt.config('newer:template', 'src/views/' + file + '_test.js');
-    // }
-    grunt.task.run('newer:template');
-  });
-  grunt.registerTask('css','newer:less');
-  // grunt.registerTask('minimg', ['imagemin:dynamic']);
-  grunt.registerTask('minimg', ['newer:imagemin:dynamic']);
+	// grunt.registerTask('default', ['imagemin']);
+	grunt.registerTask('default', ['jshint', 'simplemocha', 'template', 'less']);
+	grunt.registerTask('lint', ['newer:jshint', 'newer:jsbeautifier']);
+	grunt.registerTask('test', 'newer:simplemocha');
+	grunt.registerTask('build', ['buildcontrol:pages']);
+	grunt.registerTask('packagejs', 'newer:browserify');
+	grunt.registerTask('minjs', 'newer:uglify');
+	grunt.registerTask('html', 'newer:template');
+	grunt.registerTask('css', 'newer:less');
+	// grunt.registerTask('minimg', ['imagemin:dynamic']);
+	grunt.registerTask('minimg', ['newer:imagemin:dynamic']);
 };
